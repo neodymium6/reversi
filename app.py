@@ -3,7 +3,7 @@ import time
 import streamlit as st
 import matplotlib.pyplot as plt
 from streamlit_image_coordinates import streamlit_image_coordinates
-import osero_lib
+import reversi_lib
 import load_model
 from PIL import Image, ImageDraw 
 
@@ -40,7 +40,7 @@ def Centerize(x1,y1,x2,y2,magnif):
 
 #st component
 
-st.header("オセロ")
+st.header("リバーシ")
 if st.button(label="大きく"):
     st.session_state.dpi+=5
     st.experimental_rerun()
@@ -78,8 +78,8 @@ value = streamlit_image_coordinates(im)
 #GAMEEND
 can_put_flag=False
 for i in range(64):
-    can_put_flag=can_put_flag or osero_lib.CanPut(st.session_state.ban,i,st.session_state.turn)
-    can_put_flag=can_put_flag or osero_lib.CanPut(st.session_state.ban,i,3-st.session_state.turn)
+    can_put_flag=can_put_flag or reversi_lib.CanPut(st.session_state.ban,i,st.session_state.turn)
+    can_put_flag=can_put_flag or reversi_lib.CanPut(st.session_state.ban,i,3-st.session_state.turn)
 if not can_put_flag:
     st.text("GAMEEND")
     black_num=0
@@ -94,7 +94,7 @@ else:
     #PASS
     can_put_flag=False
     for i in range(64):
-        can_put_flag=can_put_flag or osero_lib.CanPut(st.session_state.ban,i,st.session_state.turn)
+        can_put_flag=can_put_flag or reversi_lib.CanPut(st.session_state.ban,i,st.session_state.turn)
     if not can_put_flag:
         #st.warning(str(st.session_state.turn)+"はパスです")
         if st.session_state.turn==1:
@@ -109,16 +109,16 @@ else:
     if st.session_state.turn==2:
         pos=load_model.Predict(st.session_state.ban)
         st.session_state.ban[pos]=st.session_state.turn
-        osero_lib.Reverse(st.session_state.ban,pos,st.session_state.turn)
+        reversi_lib.Reverse(st.session_state.ban,pos,st.session_state.turn)
         st.session_state.turn=3-st.session_state.turn
         time.sleep(0.1)
         st.experimental_rerun()
 
         # put first pos putable
         for i in range(64):
-            if osero_lib.CanPut(st.session_state.ban,i,st.session_state.turn):
+            if reversi_lib.CanPut(st.session_state.ban,i,st.session_state.turn):
                 st.session_state.ban[i]=st.session_state.turn
-                osero_lib.Reverse(st.session_state.ban,i,st.session_state.turn)
+                reversi_lib.Reverse(st.session_state.ban,i,st.session_state.turn)
                 st.session_state.turn=3-st.session_state.turn
                 time.sleep(0.5)
                 st.experimental_rerun()
@@ -129,9 +129,9 @@ else:
         if 16<=(value["x"]/pixel_x)<352 and 16<=(value["y"]/pixel_x)<352:
             pos=int((value["x"]/pixel_x-16)//(42)+((value["y"]/pixel_x-16)//(42))*8)
             #st.session_state.ban[0]=1
-            if osero_lib.CanPut(st.session_state.ban,pos,st.session_state.turn):
+            if reversi_lib.CanPut(st.session_state.ban,pos,st.session_state.turn):
                 st.session_state.ban[pos]=st.session_state.turn
-                osero_lib.Reverse(st.session_state.ban,pos,st.session_state.turn)
+                reversi_lib.Reverse(st.session_state.ban,pos,st.session_state.turn)
                 st.session_state.turn=3-st.session_state.turn
                 st.experimental_rerun()
             else:
